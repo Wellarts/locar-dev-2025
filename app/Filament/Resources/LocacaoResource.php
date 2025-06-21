@@ -321,7 +321,7 @@ class LocacaoResource extends Resource
                                 ->afterStateHydrated(function ($state, $record) {
                                     // Este código é executado após o formulário ser carregado
                                     $nomeCliente = $record->Cliente->nome; // Obtém o nome do cliente do registro
-                                    $state = "Olá, {$nomeCliente}! Este é o conteúdo do seu contrato.";
+                                    $state = "Olá, {{$nomeCliente}}! Esste é o conteúdo do seu contrato.";
                                     return $state;
                                 }),
                                 Fieldset::make('Financeiro')
