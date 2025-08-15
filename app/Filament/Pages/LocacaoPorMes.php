@@ -44,7 +44,7 @@ class LocacaoPorMes extends Page implements HasTable
 
             foreach($Locacoes as $Locacao){
 
-                $valorLocacaoDia = ($Locacao->valor_total_desconto / $Locacao->qtd_diarias);
+                $valorLocacaoDia = $Locacao->qtd_diarias > 0 ? ($Locacao->valor_total_desconto / $Locacao->qtd_diarias) : 0;
 
                // dd($valorLocacaoDia);
                 $dataDiarias = Carbon::create($Locacao->data_saida)->addDay(1);
