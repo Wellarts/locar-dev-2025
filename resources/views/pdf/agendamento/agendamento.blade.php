@@ -54,14 +54,17 @@
 </head>
 <body>
 
-    <table style="width: 100%">
-        <tr>
-            <td><img src="{{ asset('img/logo-hb.png') }}" alt="Image" height="50" width="150"></td>
-          <td> <p style="width: 100%; font-size:20px; font-weight: bold" align="center">Contrato de Locação de Veículos</p>
-    
-          </td>
-      </tr>
-      </table>
+<table style="width: 100%">
+    <tr>
+      <td><img src="{{ asset('img/logo-motomaster.jpg') }}" alt="Image" height="30" width="90"></td>
+      <td> <p style="width: 100%; font-size:28px; font-weight: bold;" align="center">Locadora Motomaster</p>
+           <p style="font-size:16px;" align="center">Av. Cesário de Melo, nº 4030 Campo Grande - Rio de Janeiro - RJ.<br>
+                                                    Contato: (21)7402-1183<br>
+                                                    Email: erike@rdbled.com.br - CNPJ: 53-825-708/0001-48</p>
+      </td>
+  </tr>
+
+  </table>
     <div class="retangulo">
         <span class="texto">FICHA DE AGENDAMENTO</span>
     </div>

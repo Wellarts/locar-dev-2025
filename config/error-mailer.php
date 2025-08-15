@@ -29,3 +29,4 @@ return [
  
     'storage_path' => storage_path('app/errors'),
 ];
+

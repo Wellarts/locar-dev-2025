@@ -36,9 +36,9 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->databaseNotifications()
-           // ->favicon(asset('img/logo.png'))
-          // ->brandLogo(asset('img/logo.png'))
-          //  ->brandLogoHeight('2rem')
+            ->favicon(asset('img/logo.png'))
+            ->brandLogo(asset('img/logo.png'))
+            ->brandLogoHeight('4rem')
             ->colors([
                 'primary' => Color::Amber,
             ])
@@ -80,6 +80,7 @@ class AdminPanelProvider extends PanelProvider
                       return Blade::render('@laravelPWA');
                    }
               )
+
             ->navigationItems([
                 NavigationItem::make('Manuais')
                     ->url('https://drive.google.com/drive/folders/1Pt9pkPfRKporD7Q3oLafggKGpHu4Xw46?usp=sharing', shouldOpenInNewTab: true)

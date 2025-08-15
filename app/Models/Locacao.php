@@ -36,7 +36,15 @@ class Locacao extends Model
         'valor_total_financeiro',
         'data_vencimento_financeiro',
         'ocorrencia',
-        'contrato'
+        'valor_caucao',
+        'forma_locacao',
+        'qtd_semanas',
+        'testemunha_1',
+        'testemunha_2',
+        'testemunha_1_rg',
+        'testemunha_2_rg',
+        'fiador',
+        'dados_fiador',
     ];
 
     protected $casts = [
