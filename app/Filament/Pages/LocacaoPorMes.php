@@ -33,7 +33,7 @@ class LocacaoPorMes extends Page implements HasTable
 
     public static function shouldRegisterNavigation(): bool
         {
-            return true;
+            return false;
         }
 
         public function mount()
