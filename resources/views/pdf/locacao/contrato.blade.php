@@ -55,8 +55,8 @@
 
 <table style="width: 100%">
   <tr>
-    <td><img src="{{ asset('img/logo.png') }}" alt="Image" height="60" width="180"></td>
-    <td> <p style="width: 100%; font-size:28px; font-weight: bold;" align="center">KLVIDAL LOCAÇÃO DE VEÍCULOS</p>
+    <td><img src="{{ asset('img/logo.png') }}" alt="Image" height="100" width="160"></td>
+    <td> <p style="width: 100%; font-size:24px; font-weight: bold;" align="center">KLVIDAL LOCAÇÃO DE VEÍCULOS</p>
          <p style="font-size:16px;" align="center">Avenida Presidente Costa e Silva, 1460 - Helena Maria<br>
                                                             Osasco - SP - CEP: 06253-000 - Contato: (11) 97049-3745<br>
                                                             Email: klvidalocacaodeveiculos@gmail.com<br>
@@ -238,7 +238,7 @@
 
 <table style="width: 100%">
     <tr>
-        <td><img src="{{ asset('img/logo.png') }}" alt="Image" height="60" width="180"></td>
+        <td><img src="{{ asset('img/logo.png') }}" alt="Image" height="100" width="160"></td>
       <td> <p style="width: 100%; font-size:20px; font-weight: bold" align="center">Contrato de Locação de Veículo</p>
 
       </td>
