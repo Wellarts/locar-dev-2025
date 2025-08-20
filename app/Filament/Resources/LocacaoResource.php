@@ -46,6 +46,7 @@ use Laravel\SerializableClosure\Serializers\Native;
 use Leandrocfe\FilamentPtbrFormFields\Money;
 use Illuminate\Support\Str;
 use Saade\FilamentAutograph\Forms\Components\SignaturePad;
+use App\Services\AssinafyService;
 
 class LocacaoResource extends Resource
 {
@@ -720,32 +721,116 @@ class LocacaoResource extends Resource
                     })
 
             ])
-            ->actions([
-                Tables\Actions\Action::make('Imprimir')
-                    ->url(fn(Locacao $record): string => route('imprimirLocacao', $record))
-                    ->label('Contrato 1')
-                    ->openUrlInNewTab(),
-                // Tables\Actions\Action::make('Imprimir')
-                //     ->url(fn(Locacao $record): string => route('imprimirLocacao2', $record))
-                //     ->label('Contrato 2')
-                //     ->openUrlInNewTab(),
-                Tables\Actions\EditAction::make()
-                    ->modalHeading('Editar locação')
-                    ->after(function ($data) {
-                        if ($data['status'] == 1) {
-                            $veiculo = Veiculo::find($data['veiculo_id']);
-                            $veiculo->km_atual = $data['km_retorno'];
+            ->actions(
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\Action::make('Imprimir')
+                        ->url(fn(Locacao $record): string => route('imprimirLocacao', $record))
+                        ->label('Contrato 1')
+                        ->openUrlInNewTab(),
+                    // Tables\Actions\Action::make('Imprimir')
+                    //     ->url(fn(Locacao $record): string => route('imprimirLocacao2', $record))
+                    //     ->label('Contrato 2')
+                    //     ->openUrlInNewTab(),
+                    Tables\Actions\EditAction::make()
+                        ->modalHeading('Editar locação')
+                        ->after(function ($data) {
+                            if ($data['status'] == 1) {
+                                $veiculo = Veiculo::find($data['veiculo_id']);
+                                $veiculo->km_atual = $data['km_retorno'];
+                                $veiculo->status_locado = 0;
+                                $veiculo->save();
+                            }
+                        }),
+                    Tables\Actions\Action::make('sendForSignature')
+                        ->label('Enviar para Assinatura')
+                        ->icon('heroicon-o-pencil-square')
+                        ->color('primary')  
+                        // ->url(fn(Locacao $record): string => route('imprimirLocacao', $record))  
+                        // ->openUrlInNewTab()                    
+                        ->action(function (Locacao $record) {
+                            $pdfController = new \App\Http\Controllers\Contrato();
+                            $pdfController->generateLocacaoPdf($record->id);
+                            sleep(10);
+                            $accountId = env('ASSINAFY_ACCOUNT_ID');
+                            $apiToken = env('ASSINAFY_API_TOKEN');
+                            $baseUri = env('BASE_URL');
+                            $baseUri = rtrim($baseUri, '/') . '/';
+                            $assinafyService = new \App\Services\AssinafyService($accountId, $apiToken, $baseUri);
+
+                            $documentPath = storage_path('app\\public\\contratos\\' . $record->id . '.pdf');
+                            if (!file_exists($documentPath)) {
+                                Notification::make()
+                                    ->title('Erro')
+                                    ->body('O arquivo do contrato não foi encontrado em: ' . $documentPath)
+                                    ->danger()
+                                    ->send();
+                                return;
+                            }
+                            if (!is_readable($documentPath)) {
+                                Notification::make()
+                                    ->title('Erro de Permissão')
+                                    ->body('O arquivo existe, mas não pode ser lido: ' . $documentPath)
+                                    ->danger()
+                                    ->send();
+                                return;
+                            }
+                            $documentId = $assinafyService->uploadDocument($documentPath);
+                            if (empty($documentId) || !is_string($documentId)) {
+                                Notification::make()
+                                    ->title('Erro na API')
+                                    ->body('Não foi possível enviar o documento para o Assinafy. Verifique o log para detalhes do erro.')
+                                    ->danger()
+                                    ->send();
+                                return;
+                            }
+                            $signerName = $record->cliente->nome;
+                            $signerEmail = $record->cliente->email;
+                            $packageData = $assinafyService->createSignaturePackage($documentId, $signerName, $signerEmail);
+                            if (!$packageData) {
+                                Notification::make()
+                                    ->title('Erro na API')
+                                    ->body('Não foi possível criar o pacote de assinatura.')
+                                    ->danger()
+                                    ->send();
+                                return;
+                            }
+                            $record->assinafy_package_id = $packageData->id ?? ($packageData->data->id ?? null);
+                            $record->document_id = $documentId;
+                            $record->status_assinatura = 'aguardando_assinatura';
+                            $record->save();
+                            Notification::make()
+                                ->title('Sucesso!')
+                                ->body('O contrato foi enviado para ' . $signerName . ' para assinatura.')
+                                ->success()
+                                ->send();
+                        })
+                        ->visible(fn (Locacao $record): bool => $record->status !== 'assinado'),
+                    Tables\Actions\Action::make('downloadSignedDocument')
+                        ->label('Baixar documento assinado')
+                        ->icon('heroicon-o-arrow-down-tray')
+                        ->color('success')
+                        ->visible(function (Locacao $record) {
+                            return $record->status_assinatura === 'signed';
+                        })
+                        ->action(function (Locacao $record) {
+                            $signedPath = storage_path('app/public/contratos_assinados/' . $record->id . '.pdf');
+                            if (!file_exists($signedPath)) {
+                                Notification::make()
+                                    ->title('Documento assinado não encontrado!')
+                                    ->danger()
+                                    ->send();
+                                return;
+                            }
+                            return response()->download($signedPath, 'Contrato-assinado-' . $record->id . '.pdf');
+                        }),
+                    Tables\Actions\DeleteAction::make()
+                        ->before(function ($record) {
+                            $veiculo = Veiculo::find($record->veiculo_id);
                             $veiculo->status_locado = 0;
                             $veiculo->save();
-                        }
-                    }),
-                Tables\Actions\DeleteAction::make()
-                    ->before(function ($record) {
-                        $veiculo = Veiculo::find($record->veiculo_id);
-                        $veiculo->status_locado = 0;
-                        $veiculo->save();
-                    }),
-            ])
+                        }),
+                ])
+            )
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     //  Tables\Actions\DeleteBulkAction::make(),

@@ -45,6 +45,9 @@ class Locacao extends Model
         'testemunha_2_rg',
         'fiador',
         'dados_fiador',
+        'assinafy_package_id',
+        'status_assinatura',
+        'document_id'
     ];
 
     protected $casts = [

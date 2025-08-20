@@ -22,3 +22,4 @@ Route::get('/', function () { return redirect('/admin'); })->name('login');
 
 Route::get('pdf/locacao/{id}',[Contrato::class, 'printLocacao'])->name('imprimirLocacao');
 Route::get('pdf/agendamento/{id}',[FichaAgendamento::class, 'printAgendamento'])->name('imprimirAgendamento');
+Route::post('/assinafy/webhook', [AssinafyWebhookController::class, 'handle'])->name('assinafy.webhook');

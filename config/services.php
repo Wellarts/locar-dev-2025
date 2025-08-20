@@ -31,4 +31,10 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'assinafy' => [
+        'account_id' => env('ASSINAFY_ACCOUNT_ID'),
+        'api_token' => env('ASSINAFY_API_TOKEN'),
+        'base_uri' => 'https://api.main.stage.assinafy.com.br/v1/accounts/', // Verifique a URL na documentação
+    ],
+
 ];
